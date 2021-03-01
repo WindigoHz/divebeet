@@ -2,14 +2,13 @@
 const Discord = require('discord.js');
 const { MessageEmbed } = require('discord.js')
 const client = new Discord.Client();
-const token = require('./token.json');
 
 const ytdl = require('ytdl-core');
 
 const { YTSearcher } = require('ytsearcher');
 const { getInfo } = require('ytdl-core');
 const searcher = new YTSearcher({
-    key: token.key,
+    key: process.env.youtube_api,
     revealed: true
 });
 
@@ -286,5 +285,5 @@ client.once('ready', () => {
 
 client.on('error', (error) => console.error());
 
-client.login(token.token);
+client.login(process.env.token);
 //<=========================================================================>//
