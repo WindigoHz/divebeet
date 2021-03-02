@@ -180,13 +180,13 @@ ${err}`);
         }
 
         let roleN = message.guild.roles.cache.find(role => role.name === "DJ");
-        if(!message.member.roles.cache.get(roleN.id)) {
-            return message.channel.send(`\`\`\`diff
-- ⛔ You don't have the 'DJ' role to perform this command.\`\`\``);
-        }
         if(!message.member.hasPermission('MANAGE_MESSAGES')) {        
             return message.channel.send(`\`\`\`diff
 - ⛔ You don't have the MANAGE MESSAGE permission to perform this command.\`\`\``);
+        }
+        if(!message.member.roles.cache.get(roleN.id)) {
+            return message.channel.send(`\`\`\`diff
+- ⛔ You don't have the 'DJ' role to perform this command.\`\`\``);
         }
 
         serverQueue.connection.dispatcher.end();
