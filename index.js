@@ -132,8 +132,7 @@ ${err}`);
         }
         const dispatcher = serverQueue.connection
             .play(ytdl(song.url))
-            serverQueue.txtChannel.send(`\`🎶\` **Playing  - \`${serverQueue.songs[0].title}\` -  Now**`);
-            client.on('finish', () => {
+            .on('finish', () => {
                 if(serverQueue.loopone) {
                     play(guild, serverQueue.songs[0]);
                 }
@@ -145,7 +144,8 @@ ${err}`);
                 }
                 play(guild, serverQueue.songs[0]);
             })
-    }
+            serverQueue.txtChannel.send(`\`🎶\` **Playing  - \`${serverQueue.songs[0].title}\` -  Now**`);
+        }
 
     // 📤 Bot disconnection
     function stop(message, serverQueue) {
