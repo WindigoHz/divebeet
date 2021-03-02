@@ -21,6 +21,7 @@ const queue = new Map();
 // Message Event...
 client.on('message', async (message) => {
     const prefix = ",";
+    if (!message.content.startsWith(prefix)) return;
     const serverQueue = queue.get(message.guild.id);
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
@@ -32,10 +33,12 @@ client.on('message', async (message) => {
         case 'stop':
             stop(message, serverQueue);
             break;
-
-        case 'skip':
-            skip(message, serverQueue);
+        case 'fskip':
+            fskip(message, serverQueue);
             break;
+        case 'skip':
+            vskip(serverQueue);
+            break
         case 'pause':
             pause(serverQueue);
             break;
@@ -53,6 +56,10 @@ client.on('message', async (message) => {
 
     // Queue and Search...
     async function execute(message, serverQueue) {
+        if(args.length <= 0) {
+            return message.channel.send(`\`\`\`fix
+> ⚠️ Please write the name of the song.\`\`\``);
+        }
         let voiceChannel = message.member.voice.channel;
         if(!voiceChannel) {
             return message.channel.send(`\`\`\`fix
@@ -75,7 +82,8 @@ client.on('message', async (message) => {
                     volume: 25,
                     playing: true,
                     loopone: false,
-                    loopall: false
+                    loopall: false,
+                    skipVotes: []
                 };
                 queue.set(message.guild.id, queueConstructor);
 
@@ -84,6 +92,7 @@ client.on('message', async (message) => {
                 try{
                     let connection = await voiceChannel.join();
                     queueConstructor.connection = connection;
+                    message.guild.me.voice.setSelfDeaf(true)
                     play(message.guild, queueConstructor.songs[0]);
                 }catch (err){
                     console.error(err);
@@ -125,56 +134,94 @@ ${err}`);
             .play(ytdl(song.url))
             .on('finish', () => {
                 if(serverQueue.loopone) {
-                    play(guild, serverQueue.songs[0])
+                    play(guild, serverQueue.songs[0]);
                 }
                 else if(serverQueue.loopall) {
-                    serverQueue.songs.push(serverQueue.songs[0])
-                    serverQueue.songs.shift()
+                    serverQueue.songs.push(serverQueue.songs[0]);
+                    serverQueue.songs.shift();
                 }else {
-                    serverQueue.songs.shift()
+                    serverQueue.songs.shift();
                 }
                 play(guild, serverQueue.songs[0]);
             })
-            serverQueue.txtChannel.send(`\`🎶\` **Playing  - \`${serverQueue.songs[0].title}\` -  Now**`)
+            serverQueue.txtChannel.send(`\`🎶\` **Playing  - \`${serverQueue.songs[0].title}\` -  Now**`);
     }
 
     // 📤 Bot disconnection
     function stop(message, serverQueue) {
+        if(!serverQueue) {
+            return message.channel.send(`\`\`\`diff
+- ❌ There is no music played. \`\`\``);
+        }
         if(!message.member.hasPermission('MANAGE_MESSAGES')) {
             return message.channel.send(`\`\`\`diff
-- ⛔ You don't have the 'MANAGE_MESSAGE' permission to perform this command. \`\`\``)
+- ⛔ You don't have the 'MANAGE_MESSAGE' permission to perform this command. \`\`\``);
         }
-        if(!message.member.voice.channel){
+        if(message.member.voice.channel != message.guild.me.voice.channel){
             return message.channel.send(`\`\`\`fix
-> ⚠️ You have to join a voice channel first to use this command. \`\`\``)
+> ⚠️ You have to join a voice channel first to use this command. \`\`\``);
         }
         serverQueue.songs = [];
-        serverQueue.connection.dispatcher.end()
+        serverQueue.connection.dispatcher.end();
         message.channel.send("**Disconnected** 📤");
     }
 
-    // ⏭️ Skip music
-    function skip(message, serverQueue) {
-        if(!message.member.voice.channel) {
+    // ⏭️ Force Skip music
+    function fskip(message, serverQueue) {
+        if(message.member.voice.channel != message.guild.me.voice.channel) {
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command.\`\`\``);
         }
         if(!serverQueue) {
-            return  message.channel.send(`\`\`\`fix
-> ❌ There is nothing to skip.\`\`\``);            
+            return  message.channel.send(`\`\`\`diff
+- ❌ There is no music played.\`\`\``);            
         }
-        serverQueue.connection.dispatcher.end()
+
+        let roleN = message.guild.roles.cache.find(role => role.name === "DJ");
+        if(!message.member.roles.cache.get(roleN.id) || !message.member.hasPermission('MANAGE_MESSAGES')) {
+            return message.channel.send(`\`\`\`diff
+- ⛔ You don't have the 'MANAGE_MESSAGE'permission or a 'DJ' role to perform this command.\`\`\``);
+        }
+        serverQueue.connection.dispatcher.end();
         message.channel.send("⏭️ **Skipped**");
 
     }
 
+    // ⏭️ Vote Skip music
+    function vskip(serverQueue) {
+        if(!serverQueue) {
+            return  message.channel.send(`\`\`\`diff
+- ❌ There is no music played.\`\`\``);
+        }
+        if(!message.member.voice.channel != message.guild.me.voice.channel) {
+            return message.channel.send(`\`\`\`fix
+> ⚠️ You have to join a voice channel first to use this command.\`\`\``);
+        }
+
+        let usersC = message.member.voice.channel.members.size;
+        let required = Math.ceil(usersC / 2);
+
+        if(serverQueue.skipVotes.includes(message.member.id)) {
+            return message.channel.send(`\`\`\`fix
+> ⚠️ You already voted to skip...\`\`\``);
+        }
+        serverQueue.skipVotes.push(message.member.id);
+        message.channel.send(`\`✔️\` **You voted to skip the song, \`[${serverQueue.skipVotes.length} / ${required}]\`**`)
+        if(serverQueue.skipVotes.length >= required) {
+            serverQueue.connection.dispatcher.end();
+            serverQueue.skipVotes = [];
+            message.channel.send('⏭️ **Skipped**');
+        }
+                
+    }
+
     // ⏸️ Pause music
     function pause(serverQueue) {
-        if(!serverQueue.connection) {
-            return message.channel.send(`\`\`\`fix
-> ⚠️ There is no music currently playing\`\`\``);            
-        }
-        if(!message.member.voice.channel) {
+        if(!serverQueue) {
+        return  message.channel.send(`\`\`\`diff
+- ❌ There is no music played.\`\`\``)
+        }          
+        if(!message.member.voice.channel != message.guild.me.voice.channel) {
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command.\`\`\``);
         }
@@ -189,11 +236,11 @@ ${err}`);
 
     // ⏯️ Resume music
     function resume(serverQueue){
-        if(!serverQueue.connection) {
-            return message.channel.send(`\`\`\`fix
-> ⚠️ There is no music currently playing\`\`\``);            
+        if(!serverQueue) {
+            return  message.channel.send(`\`\`\`diff
+- ❌ There is no music played.\`\`\``);            
         }
-        if(!message.member.voice.channel) {
+        if(message.member.voice.channel != message.guild.me.voice.channel) {
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command.\`\`\``);
         }
@@ -207,11 +254,11 @@ ${err}`);
 
     // 🔄 Loop music
     function Loop(args, serverQueue) {
-        if(!serverQueue.connection) {
-            return message.channel.send(`\`\`\`fix
-> ⚠️ There is no music currently playing\`\`\``);            
+        if(!serverQueue) {
+            return  message.channel.send(`\`\`\`diff
+- ❌ There is no music played.\`\`\``);            
         }
-        if(!message.member.voice.channel) {
+        if(message.member.voice.channel != message.guild.me.voice.channel) {
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command.\`\`\``);
         }
@@ -253,11 +300,11 @@ ${err}`);
 
     // 📜 Queue
     function Queue(serverQueue) {
-        if(!serverQueue.connection) {
-            return message.channel.send(`\`\`\`fix
-> ⚠️ There is no music currently playing\`\`\``);            
+        if(!serverQueue) {
+            return message.channel.send(`\`\`\`diff
+- ❌ There is no music played.\`\`\``);            
         }
-        if(!message.member.voice.channel) {
+        if(message.member.voice.channel != message.guild.me.voice.channel) {
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command.\`\`\``);
         }
