@@ -298,7 +298,7 @@ ${err}`);
         }
     }
 
-    // 📜 Queue
+    // 📜 Queue...
     function Queue(serverQueue) {
         if(!serverQueue) {
             return message.channel.send(`\`\`\`diff
