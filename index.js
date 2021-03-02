@@ -154,11 +154,6 @@ ${err}`);
 - ❌ There is no music played. \`\`\``);
         }
 
-        if(!message.member.hasPermission('MANAGE_MESSAGES')) {
-            return message.channel.send(`\`\`\`diff
-- ⛔ You don't have the 'MANAGE_MESSAGE' permission to perform this command. \`\`\``);
-        }
-
         if(message.member.voice.channel != message.guild.me.voice.channel){
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command. \`\`\``);
@@ -180,15 +175,10 @@ ${err}`);
         }
 
         let roleN = message.guild.roles.cache.find(role => role.name === "DJ");
-        if(!message.member.hasPermission('MANAGE_MESSAGES')) {        
-            return message.channel.send(`\`\`\`diff
-- ⛔ You don't have the MANAGE MESSAGE permission to perform this command.\`\`\``);
-        }
         if(!message.member.roles.cache.get(roleN.id)) {
             return message.channel.send(`\`\`\`diff
 - ⛔ You don't have the 'DJ' role to perform this command.\`\`\``);
         }
-
         serverQueue.connection.dispatcher.end();
         message.channel.send("⏭️ **Skipped**");
 
