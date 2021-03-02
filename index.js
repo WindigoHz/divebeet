@@ -112,9 +112,9 @@ ${err}`);
                     .setDescription(`\`➕\` **Added to queue**`)
                     .addFields(
                         //{ name: '\u200B', value: '\u200B' }
-                        { name: 'Position in queue', value: '0' ,inline: true },
-                        { name: 'Song Duration', value: 'X:x', inline: true },
-                        { name: 'Estimated time until playing', value: 'X:x', inline: true }
+                        //{ name: 'Position in queue', value: '0' ,inline: true },
+                        //{ name: 'Song Duration', value: 'X:x', inline: true },
+                        //{ name: 'Estimated time until playing', value: 'X:x', inline: true }
                     );
                 serverQueue.songs.push(song);
                 return message.channel.send(embed)
@@ -193,7 +193,7 @@ ${err}`);
             return  message.channel.send(`\`\`\`diff
 - ❌ There is no music played.\`\`\``);
         }
-        if(!message.member.voice.channel != message.guild.me.voice.channel) {
+        if(message.member.voice.channel != message.guild.me.voice.channel) {
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command.\`\`\``);
         }
@@ -221,7 +221,7 @@ ${err}`);
         return  message.channel.send(`\`\`\`diff
 - ❌ There is no music played.\`\`\``)
         }          
-        if(!message.member.voice.channel != message.guild.me.voice.channel) {
+        if(message.member.voice.channel != message.guild.me.voice.channel) {
             return message.channel.send(`\`\`\`fix
 > ⚠️ You have to join a voice channel first to use this command.\`\`\``);
         }
