@@ -13,10 +13,11 @@ module.exports.run = (client, message, args, queue, searcher) => {
 - ❌ There is no music played.\`\`\``);            
     }
 
-    let roleN = message.guild.roles.cache.find(role => role.name === "DJ");
-    if(!message.member.roles.cache.get(roleN.id)) {
+    //let roleN = message.guild.roles.cache.find(role => role.name === "DJ");
+    //if(!message.member.roles.cache.get(roleN.id))
+    if(!message.member.hasPermission('MANAGE_MESSAGES')) {
         return message.channel.send(`\`\`\`diff
-- ⛔ You don't have the 'DJ' role to perform this command.\`\`\``);
+- ⛔ You don't have the  required permissions to perform this command.\`\`\``);
     }
     serverQueue.connection.dispatcher.end();
     message.channel.send("⏭️ **Skipped**");

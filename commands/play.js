@@ -13,18 +13,27 @@ module.exports.run = async (client, message, args, queue, searcher) => {
     let url = args.join('');
     if(url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
         await ytpl(url).then(async playlist => {
-            const p_embed = new Discord.MessageEmbed()
-                .setColor("#ff0000")
-                .setAuthor(message.author.username, message.author.displayAvatarURL())
-                .setTitle(playlist.title)
-                .setURL(playlist.url)
-                .setThumbnail(playlist.thumbnail)
-                .setDescription(`\`➕\` **Playlist added to queue**`)
-            message.channel.send(p_embed)
-            playlist.items.forEach(async item => {
-                await videoHandler(await ytdl.getInfo(item.shortUrl), message, voiceChannel, true);
-            })
+            if(playlist.url <= 0)
+                return message.send(`\`\`\`diff
+- ❌ The playlist does not exist.\`\`\``);
+            if(playlist.title <= 0)
+                return message.send(`\`\`\`diff
+- ❌ The playlist does not exist.\`\`\``);
+            else{
+                const p_embed = new Discord.MessageEmbed()
+                    .setColor("#252525")
+                    .setAuthor(message.author.username, message.author.displayAvatarURL())
+                    .setTitle(playlist.title)
+                    .setURL(playlist.url)
+                    .setThumbnail(playlist.thumbnail)
+                    .setDescription(`\`➕\` **Playlist added to queue**`)
+                message.channel.send(p_embed)
+                playlist.items.forEach(async item => {
+                    await videoHandler(await ytdl.getInfo(item.shortUrl), message, voiceChannel, true);
+                })
+            }
         })
+
     }else {
         let result = await searcher.search(args.join(' '), { type: 'video'})
         if (result.first == null)
@@ -76,7 +85,7 @@ ${err}`);
             //const user = message.author
             let dur = `${parseInt(song.vLength / 60)}:${song.vLength - 60 * parseInt(song.vLength / 60)}`
             const embed = new Discord.MessageEmbed()
-                .setColor("#ff0000")
+                .setColor("#252525")
                 .setAuthor(message.author.username, message.author.displayAvatarURL())
                 .setTitle(song.title)
                 .setURL(song.url)
@@ -98,6 +107,7 @@ ${err}`);
             queue.delete(guild.id);
             return;
         }
+        serverQueue.txtChannel.send(`\`🎶\` **Now playing:  - \`${serverQueue.songs[0].title}\` -**`);
         const dispatcher = serverQueue.connection
             .play(ytdl(song.url))
             .on('finish', () => {
@@ -111,9 +121,9 @@ ${err}`);
                     serverQueue.songs.shift();
                 }
                 play(guild, serverQueue.songs[0]);
+                
             })
 
-            serverQueue.txtChannel.send(`\`🎶\` **Now playing:  - \`${serverQueue.songs[0].title}\` -**`);
     }   
 }
 
