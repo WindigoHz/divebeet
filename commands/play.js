@@ -12,26 +12,19 @@ module.exports.run = async (client, message, args, queue, searcher) => {
 
     let url = args.join('');
     if(url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
-        await ytpl(url).then(async playlist => {
-            if(playlist.url <= 0)
-                return message.send(`\`\`\`diff
-- ❌ The playlist does not exist.\`\`\``);
-            if(playlist.title <= 0)
-                return message.send(`\`\`\`diff
-- ❌ The playlist does not exist.\`\`\``);
-            else{
-                const p_embed = new Discord.MessageEmbed()
-                    .setColor("#252525")
-                    .setAuthor(message.author.username, message.author.displayAvatarURL())
-                    .setTitle(playlist.title)
-                    .setURL(playlist.url)
-                    .setThumbnail(playlist.thumbnail)
-                    .setDescription(`\`➕\` **Playlist added to queue**`)
-                message.channel.send(p_embed)
-                playlist.items.forEach(async item => {
-                    await videoHandler(await ytdl.getInfo(item.shortUrl), message, voiceChannel, true);
-                })
-            }
+        await ytpl(url).then(async playlist => {    
+            const p_embed = new Discord.MessageEmbed()
+                .setColor("#252525")
+                .setAuthor(message.author.username, message.author.displayAvatarURL())
+                .setTitle(playlist.title)
+                .setURL(playlist.url)
+                .setThumbnail(playlist.thumbnail)
+                .setDescription(`\`➕\` **Playlist added to queue**`)
+            message.channel.send(p_embed)
+            playlist.items.forEach(async item => {
+                await videoHandler(await ytdl.getInfo(item.shortUrl), message, voiceChannel, true);
+            })
+            
         })
 
     }else {
