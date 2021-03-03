@@ -8,7 +8,12 @@ module.exports.run = async (client, message, args, queue, searcher) => {
 
     if(!voiceChannel)
         return message.channel.send(`\`\`\`fix
-> ⚠️ You have to join a voice channel first to use this command. \`\`\``)
+> ⚠️ You have to join a voice channel first to use this command. \`\`\``);
+
+    if(args.length < 1) 
+        return message.channel.send(`\`\`\`fix
+# ⚠️ Please specify what video you want to play\`\`\``);
+    
 
     let url = args.join('');
     if(url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
@@ -100,15 +105,16 @@ ${err}`);
             queue.delete(guild.id);
             return;
         }
-        serverQueue.txtChannel.send(`\`🎶\` **Now playing:  - \`${serverQueue.songs[0].title}\` -**`);
         const dispatcher = serverQueue.connection
             .play(ytdl(song.url))
             .on('finish', () => {
                 if(serverQueue.loopone) {
                     play(guild, serverQueue.songs[0]);
+                    serverQueue.txtChannel.send(`\`🎶\` **Now playing:  - \`${serverQueue.songs[0].title}\` -**`);
                 }
                 else if(serverQueue.loopall) {
                     serverQueue.songs.push(serverQueue.songs[0]);
+                    serverQueue.txtChannel.send(`\`🎶\` **Now playing:  - \`${serverQueue.songs[0].title}\` -**`);
                     serverQueue.songs.shift();
                 }else {
                     serverQueue.songs.shift();
