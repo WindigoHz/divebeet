@@ -13,10 +13,9 @@ module.exports.run = async (client, message, args, queue, searcher) => {
     let url = args.join('');
     if(url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
         await ytpl(url).then(async playlist => {
-            const user = message.author
             const p_embed = new Discord.MessageEmbed()
                 .setColor("#ff0000")
-                .setAuthor(user.username, user.displayAvatarURL())
+                .setAuthor(message.author.username, message.author.displayAvatarURL())
                 .setTitle(playlist.title)
                 .setURL(playlist.url)
                 .setThumbnail(playlist.thumbnail)
@@ -78,7 +77,7 @@ ${err}`);
             let dur = `${parseInt(song.vLength / 60)}:${song.vLength - 60 * parseInt(song.vLength / 60)}`
             const embed = new Discord.MessageEmbed()
                 .setColor("#ff0000")
-                .setAuthor(user.username, user.displayAvatarURL())
+                .setAuthor(message.author.username, message.author.displayAvatarURL())
                 .setTitle(song.title)
                 .setURL(song.url)
                 .setThumbnail(song.thumbnail)
