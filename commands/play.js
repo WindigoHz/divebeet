@@ -119,8 +119,7 @@ ${err}`);
                 }else {
                     serverQueue.songs.shift();
                 }
-                play(guild, serverQueue.songs[0]);
-                
+                play(guild, serverQueue.songs[0]);                
             })
 
     }   
