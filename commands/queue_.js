@@ -50,9 +50,10 @@ function embedGenerator(serverQueue, message) {
         const info = current.map(song => `\`${++j}.\` [${song.title}](${song.url})`).join('\n')
         const user = message.author
         const q_embed = new Discord.MessageEmbed()
-            .setAuthor(user.username, user.displayAvatarURL())
-            .setTitle(`**Queue for ${message.guild.name}**`)
-            .setDescription(`_Now playing_: [${serverQueue.songs[0].title}](${serverQueue.songs[0].url}) \n \n _Upcoming_: \n ${info}`)
+            .setColor('#35f092')
+            .setTitle(`**Queue for ${message.guild.name}**`, 'https://discord.gg/mZyFZ59Y3F')
+            .setDescription(`__Now playing__: **[${serverQueue.songs[0].title}](${serverQueue.songs[0].url})**\n
+            \n __Upcoming__:\n ${info}  \`💡 Requester: ${message.author.username}\`\n`)
             .setFooter(user.username, user.displayAvatarURL());
         embeds.push(q_embed)
     }
