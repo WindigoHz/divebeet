@@ -1,3 +1,4 @@
+/*
 const Discord = require('discord.js');
 const lyricsFinder = require('lyrics-finder');
 
@@ -14,15 +15,15 @@ module.exports.run = async (client, message, args, queue, searcher) => {
     const messageFilter = m => m.author.id === message.author.id;
     const reactionFilter = (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && (message.author.id === user.id)
 
-    message.channel.send(`Please enter song name now.`);
+    message.channel.send(`Please enter song name now.`)
     await message.channel.awaitMessage(messageFilter, { max: 1, time: 15000 }).then(async collected => {
         songName = collected.first().content;
         await finder(artist, songName, message, pages)
     })
     
     const lyricEmbed = await message.channel.send(`Lyrics page: ${currentPage + 1}/${pages.length}`, pages[currentPage])
-    await lyricEmbed.react('⬅️');
-    await lyricEmbed.react('➡️');
+    await lyricEmbed.react('⬅️')
+    await lyricEmbed.react('➡️')
 
     const collector = lyricEmbed.createReactionCollector(reactionFilter);
     collector.on('collect', (reaction, user) => {
@@ -43,7 +44,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
 }
 
 async function finder(artist, songName, message, pages) {
-    let fullLyrics = await lyricsFinder(artist, songName) || 'error page 404 not found'
+    let fullLyrics = await lyricsFinder(artist, songName) || 'Not found'
 
     for (let i = 0; i < fullLyrics.length; i += 2048) {
         const lyric = fullLyrics.substring(i, Math.min(fullLyrics.length, i + 2048))
@@ -57,3 +58,4 @@ module.exports.config = {
     name: 'lyrics',
     aliases: ['ly', 'lyric', 'l', 'lyr']
 }
+*/
