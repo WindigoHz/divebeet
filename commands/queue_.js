@@ -42,6 +42,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
 
 function embedGenerator(serverQueue, message) {
     const embeds = [];
+    let currentPage = 0;
     let songs = 10;
     for (i = 1; i < serverQueue.songs.length; i += 10) {
         const current = serverQueue.songs.slice(i, songs)
