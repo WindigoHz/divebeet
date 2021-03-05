@@ -14,7 +14,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
     }
 
     let currentPage = 0;
-    const embeds = embedGenerator(serverQueue)
+    const embeds = embedGenerator(serverQueue, message)
 
     const queueEmbed = await message.channel.send(`queue page: ${currentPage + 1}/${embeds.length}`, embeds[currentPage])
     await queueEmbed.react('⬅️');
@@ -40,7 +40,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
 
 }
 
-function embedGenerator(serverQueue) {
+function embedGenerator(serverQueue, message) {
     const embeds = [];
     let songs = 10;
     for (i = 1; i < serverQueue.songs.length; i += 10) {
