@@ -1,5 +1,5 @@
 module.exports.run = (message) => {
-    message.channel.send('Hey!')
+    message.channel.send('Hey user!')
 }
 
 module.exports.config = {
